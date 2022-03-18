@@ -1,0 +1,42 @@
+kind: Simple
+apiVersion: k3d.io/v1alpha4
+metadata:
+  name: mykube
+servers: 1
+agents: 6
+image: rancher/k3s:v1.20.4-k3s1
+ports:
+- port: 80:80
+  nodeFilters:
+  - loadbalancer
+- port: 443:443
+  nodeFilters:
+  - loadbalancer
+options:
+  k3d:
+    wait: false
+    disableLoadbalancer: false
+    disableImageVolume: false
+    disableRollback: false
+  k3s:
+    extraArgs:
+    - arg: --no-deploy=traefik
+      nodeFilters:
+      - server:*
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true
+  runtime:
+    labels:
+    - label: topology.kubernetes.io/zone=us-east-1a
+      nodeFilters:
+      - agent:0
+      - agent:1
+    - label: topology.kubernetes.io/zone=us-east-1b
+      nodeFilters:
+      - agent:2
+      - agent:3
+    - label: topology.kubernetes.io/zone=us-east-1c
+      nodeFilters:
+      - agent:4
+      - agent:5

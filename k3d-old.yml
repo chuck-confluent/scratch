@@ -1,0 +1,34 @@
+# k3d configuration file, saved as e.g. /home/me/myk3dcluster.yaml . See https://k3d.io/usage/configfile/
+apiVersion: k3d.io/v1alpha2 # this will change in the future as we make everything more stable
+kind: Simple # internally, we also have a Cluster config, which is not yet available externally
+name: mykube # name that you want to give to your cluster (will still be prefixed with `k3d-`)
+servers: 1 # same as `--servers 1`
+agents: 6 # same as `--agents 2`
+image: rancher/k3s:v1.20.4-k3s1 # same as `--image rancher/k3s:v1.20.4-k3s1`
+options:
+  kubeconfig:
+    updateDefaultKubeconfig: true # add new cluster to your default Kubeconfig; same as `--kubeconfig-update-default` (default: true)
+    switchCurrentContext: true # also set current-context to the new cluster's context; same as `--kubeconfig-switch-context` (default: true)
+  k3s:
+    extraServerArgs:
+      - "--no-deploy=traefik"
+ports:
+  - port: 80:80 # same as `--port '80:80@loadbalancer'`
+    nodeFilters:
+      - loadbalancer
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer
+labels:
+  - label: topology.kubernetes.io/zone=us-east-1a
+    nodeFilters:
+      - agent[0]
+      - agent[1]
+  - label: topology.kubernetes.io/zone=us-east-1b
+    nodeFilters:
+      - agent[2]
+      - agent[3]
+  - label: topology.kubernetes.io/zone=us-east-1c
+    nodeFilters:
+      - agent[4]
+      - agent[5]
